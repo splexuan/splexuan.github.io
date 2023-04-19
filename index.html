@@ -34,6 +34,7 @@
 .upload-btn i {
   margin-right: 5px;
 }
+
 </style>
 <body>
   <div class="layui-container">
@@ -41,13 +42,15 @@
       <label for="file-input" class="upload-btn"><i class="fa fa-upload"></i> 选择文件</label>
       <input type="file" name="file" id="file-input" class="inputfile" />
     </div>
-    <div id="but" class="layui-btn-container" style="text-align: center;margin-top:20px"></div>
+    <button type="button" class="layui-btn layui-btn-normal" id="open">展开</button>
+    <div id="but" class="layui-btn-container" style="text-align: center;margin-top:20px;"></div>
     <table id="list" lay-filter="bucket"></table>
   </div>
 </body>
 <script>
     var table = layui.table;
     var list;
+    var buttons;
     const fileInput = document.getElementById('file-input');
 
     fileInput.addEventListener('change', function() {
@@ -60,6 +63,8 @@
         reader.onload = function(event) {
           const content = event.target.result;
           jiexi(content);
+          $("#but").show()
+          $("#open").html("收起")
         }
         reader.readAsText(file);
       }
@@ -131,6 +136,18 @@
             limit:30,
             data: list[key]
         });
+        $("#but").hide()
+        $("#open").html("展开")
+    });
+
+    $("#open").click(function(){
+        if($("#but").css("display") == "none"){
+          $("#but").show()
+          $("#open").html("收起")
+        }else{
+          $("#but").hide()
+          $("#open").html("展开")
+        }
     });
   </script>
 </html>
