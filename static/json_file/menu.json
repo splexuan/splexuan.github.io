@@ -1,0 +1,17 @@
+[
+	{
+		"head": "工具",
+		"list": [
+			{
+				"name": "浏览器书签文件解析",
+				"url": "bookmark_analysis.html",
+				"type": "self"
+			},
+			{
+				"name": "搜书神器",
+				"url": "book.html",
+				"type": "self"
+			}
+		]
+	}
+]

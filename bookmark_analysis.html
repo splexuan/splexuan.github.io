@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>解析浏览器书签</title>
+<link rel="stylesheet" href="static/layui-v2.8.0/layui/css/layui.css">
+</head>
+<style>
+.inputfile {
+  opacity: 0;
+  position: absolute;
+  z-index: 1;
+  /* 其他样式 */
+}
+
+.upload-btn {
+  display: inline-block;
+  background-color: #2196F3;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+.upload-btn:hover {
+  background-color: #1976D2;
+}
+
+.upload-btn i {
+  margin-right: 5px;
+}
+
+</style>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header"> <div class="layui-logo layui-hide-xs layui-bg-black">解析浏览器书签</div></div>
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <!-- 侧边导航: <ul class="layui-nav layui-nav-tree layui-nav-side"> -->
+        <li class="layui-nav-item layui-nav-itemed">
+          <a href="javascript:;">文件夹</a>
+          <dl class="layui-nav-child" id="select"></dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="layui-body">
+    <div class="layui-container">
+      <div style="text-align: center;margin-top: 20px;">
+        <label for="file-input" class="upload-btn"><i class="fa fa-upload"></i> 选择文件</label>
+        <input type="file" name="file" id="file-input" class="inputfile" />
+      </div>
+      <!-- <button type="button" class="layui-btn layui-btn-normal" id="open">展开</button> -->
+      <div id="but" class="layui-btn-container" style="text-align: center;margin-top:20px;"></div>
+      <table id="list" lay-filter="bucket"></table>
+    </div>
+  </div>
+</div>
+<script src="static/jquery/jquery.js"></script>
+<script src="static/layui-v2.8.0/layui/layui.js"></script>
+<script>
+
+    layui.use(['dropdown','element'], function(){
+      var dropdown = layui.dropdown;
+      var element = layui.element;
+      var table = layui.table;
+      var list;
+      var buttons;
+      const fileInput = document.getElementById('file-input');
+
+      //一些事件触发
+      element.on('nav(test)', function(data){
+        createTable(data.html());
+      });
+
+      fileInput.addEventListener('change', function() {
+        const files = fileInput.files;
+        if (files.length === 0) {
+          alert("未选择文件");
+        } else {
+          const file = files[0];
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const content = event.target.result;
+            jiexi(content);
+          }
+          reader.readAsText(file);
+        }
+      });
+
+      function jiexi(bookmark_html){
+            // 定义正则表达式模式，匹配所有链接、标题和文件夹名称
+            const pattern = /<DT><H3[^>]*>(.*?)<\/H3>(.*?)<\/DL>/gs;
+            const bookmark_pattern = /<DT><A HREF="(.*?)"[^>]*>(.*?)<\/A>/gi;
+
+            // 执行正则表达式匹配，获取所有文件夹和链接
+            const matches = [];
+            let match;
+            while ((match = pattern.exec(bookmark_html)) !== null) {
+              matches.push(match);
+            }
+
+            // 组成数组
+            const bookmarks = {};
+            matches.forEach(match => {
+              const folder_name = match[1];
+              const folder_html = match[2];
+              const bookmark_matches = [];
+              let bookmark_match;
+              while ((bookmark_match = bookmark_pattern.exec(folder_html)) !== null) {
+                bookmark_matches.push(bookmark_match);
+              }
+              bookmarks[folder_name] = [];
+              bookmark_matches.forEach(bookmark_match => {
+                bookmarks[folder_name].push({
+                  title: bookmark_match[2],
+                  url: bookmark_match[1]
+                });
+              });
+            });
+            list = bookmarks;
+            getTitle(bookmarks);
+            // 生成 JSON 格式数据
+            // const json_data = JSON.stringify(bookmarks);
+
+            // 输出 JSON 数据
+            // console.log(bookmarks);
+      }
+      function getTitle(obj) {
+          var arr = [];
+          $("#select").html("");
+          for(let key in obj) {
+              $("#select").append('<dd><a href="javascript:;">'+key+'</a></dd>');
+              element.render('nav')
+          }
+      }
+
+      function createTable(key){
+        if(Object.keys(list[key]).length == 0){
+            layer.msg("无数据",{icon: 2})
+            return false;
+          }
+          fileList = table.render({
+              elem: '#list',
+              cols: [[
+                  {field: 'title', title: '名称'},
+                  {field: 'url', title: '链接',templet:function(data){
+                      return "<a target='_blank' href='"+data.url+"'>"+data.url+"</a>";
+                    }
+                  },
+              ]],
+              page:true,
+              limit:20,
+              data: list[key]
+          });
+      }
+    });
+  </script>
+</body>
+</html>
+      
