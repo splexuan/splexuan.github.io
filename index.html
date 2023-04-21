@@ -21,45 +21,6 @@
             margin-top: 50px;
             text-align: center;
         }
-        .bookmarks {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 50px 5%;
-            width: 90%;
-        }
-        .bookmarks section {
-            padding: 20px;
-            flex-basis: 33.3%;
-            box-sizing: border-box;
-            border: 1px solid #eee;
-        }
-        .bookmarks section:nth-of-type(2n - 1) { background: #fafafa; }
-        .bookmarks ul { padding: 0 15px; }
-        .bookmarks ul li {
-            position: relative;
-            margin: 10px 0;
-            list-style: none;
-          text-align: left;
-        }
-        .bookmarks ul li:before {
-            content: "";
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #c9ced1;
-            border-radius: 50%;
-            left: -13px;
-            top: 12px;
-        }
-        @media (prefers-color-scheme: dark) {
-          html { background: #0e121c; }
-          body { color: #6C7486; }
-          h3 { color: #cadef8; }
-          .bookmarks section { border: 1px solid #2c2e43; background: #191e31; }
-          .bookmarks section:nth-of-type(2n - 1) { background: #151B2A; }
-          .bookmarks ul li:before { background: #6C7486; }
-          .bookmarks a:hover { color: #cadef8; }
-        }
         /* 去除 iFrame 元素的内边距和边框 */
         iframe {
           display: block;
@@ -74,10 +35,11 @@
     <div id="body" style="width:100%;height:100%">
         <iframe src="body.html" style="width:100%;height:100%"></iframe>
     </div>
-    <div id="content" style="display:none;">
-        <h1>Bookmarks</h1>
-        <div class="bookmarks" id="menu">
+    <div class="layui-container">  
+      <div class="layui-row">
+        <div class="layui-col-xs6 layui-col-sm6 layui-col-md4" style="text-align: left;" id="menu">
         </div>
+      </div>
     </div>
 </body>
 </html>
@@ -111,12 +73,12 @@ function getJsonFile(path = "static/json_file/menu.json"){
         // 处理获取到的 JSON 数据
         html = "";
         $.each(data, function(key, value) {
-          html += '<section><h3 id="angular-2-docs">'+value.head+'</h3><ul>';
+          html += '<div class="layui-card"><div class="layui-card-header"><h1>'+value.head+'</h1></div><div class="layui-card-body">';
           $.each(value.list, function(k, v) {
             // console.log(v);
-            html += '<li><a url="'+v.url+'" type="'+v.type+'">'+v.name+'</a></li>';
+            html += '<a url="'+v.url+'" type="'+v.type+'">'+v.name+'</a><br/>';
           });
-          html += '</section></ul>';
+          html += '</div>';
           $("#menu").html(html)
         });
         console.log(html);
