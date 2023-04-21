@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>lexuan小站</title>
+  <link rel="stylesheet" href="static/layui-v2.8.0/layui/css/layui.css">
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo layui-hide-xs layui-bg-black">lexuan小站</div>
+    <!-- 头部区域（可配合layui 已有的水平导航） -->
+   <!--  <ul class="layui-nav layui-layout-left">
+      <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
+        <i class="layui-icon layui-icon-spread-left"></i>
+      </li>
+      
+      <li class="layui-nav-item layui-hide-xs"><a href="">nav 1</a></li>
+      <li class="layui-nav-item layui-hide-xs"><a href="">nav 2</a></li>
+      <li class="layui-nav-item layui-hide-xs"><a href="">nav 3</a></li>
+      <li class="layui-nav-item">
+        <a href="javascript:;">nav groups</a>
+        <dl class="layui-nav-child">
+          <dd><a href="">menu 11</a></dd>
+          <dd><a href="">menu 22</a></dd>
+          <dd><a href="">menu 33</a></dd>
+        </dl>
+      </li>
+    </ul> -->
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+        <a href="javascript:;">
+          <img src="upload/image/lexuan_head.jpg" class="layui-nav-img">
+          lexuan
+        </a>
+        <!-- <dl class="layui-nav-child">
+          <dd><a href="">Your Profile</a></dd>
+          <dd><a href="">Settings</a></dd>
+          <dd><a href="">Sign out</a></dd>
+        </dl> -->
+      </li>
+      <!-- <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+        <a href="javascript:;">
+          <i class="layui-icon layui-icon-more-vertical"></i>
+        </a>
+      </li> -->
+    </ul>
+  </div>
+  
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree" lay-filter="test" id="menu">
+      </ul>
+    </div>
+  </div>
+  
+  <div class="layui-body">
+    <iframe src="body.html" style="width:100%;height:100%"></iframe>
+  </div>
+  
+ <!--  <div class="layui-footer">
+
+  </div> -->
+</div>
+<script src="static/jquery/jquery.js"></script>
+<script src="static/layui-v2.8.0/layui/layui.js"></script>
+<script>
+//JS 
+layui.use(['element', 'layer', 'util'], function(){
+  var element = layui.element
+  ,layer = layui.layer
+  ,util = layui.util
+  ,$ = layui.$;
+   getJsonFile();
+  element.on('nav(test)', function(data){
+    if(data.attr("type") == "self"){
+      layer.open({
+        type: 2,
+        title: data.html(),
+        area: ['90%', '90%'],
+        content: data.attr("url") // 这里填写需要弹出的网页地址
+      });
+    }else if(data.attr("type") == "new"){
+      window.open(data.attr("url"), '_blank');
+    }
+    
+  });
+
+  //头部事件
+  util.event('lay-header-event', {
+    //左侧菜单事件
+    menuLeft: function(othis){
+      layer.msg('展开左侧菜单的操作', {icon: 0});
+    }
+    ,menuRight: function(){
+      layer.open({
+        type: 1
+        ,content: '<div style="padding: 15px;">处理右侧面板的操作</div>'
+        ,area: ['260px', '100%']
+        ,offset: 'rt' //右上角
+        ,anim: 5
+        ,shadeClose: true
+      });
+    }
+  });
+ 
+
+  function getJsonFile(path = "static/json_file/menu.json"){
+    // 创建一个新的 XMLHttpRequest 对象
+    var xhr = new XMLHttpRequest();
+
+    // 设置请求的类型、URL 以及是否异步
+    xhr.open('GET', path, true);
+
+    // 设置响应类型为 JSON
+    xhr.responseType = 'json';
+
+    // 当请求完成时执行的回调函数
+    xhr.onload = function() {
+      // 如果请求成功
+      if (xhr.status === 200) {
+        // 获取响应数据
+        var data = xhr.response;
+        // 处理获取到的 JSON 数据
+        html = "";
+        $.each(data, function(key, value) {
+          html += '<li class="layui-nav-item layui-nav-itemed"><a>'+value.head+'</a><dl class="layui-nav-child">';
+          $.each(value.list, function(k, v) {
+            // console.log(v);
+            html += '<dd><a url="'+v.url+'" type="'+v.type+'">'+v.name+'</a></dd>';
+          });
+          html += '</dl></li>';
+          $("#menu").html(html)
+          element.render('nav')
+        });
+
+
+        console.log(html);
+      }
+    };
+
+    // 发送异步请求
+    xhr.send();
+  }
+});
+</script>
+</body>
+</html>
