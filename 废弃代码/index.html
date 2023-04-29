@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Bookmarks</title>
+  <link rel="stylesheet" type="text/css" href="static/assets/css/main.css"/>
+  <link rel="stylesheet" href="static/layui-v2.8.0/layui/css/layui.css">
+    <style>
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        body {
+            font: 18px/1.8 Ruluko, "PingFang SC", "Microsoft Jhenghei", "Microsoft YaHei", sans-serif;
+        }
+        h1 {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .bookmarks {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 50px 5%;
+            width: 90%;
+        }
+        .bookmarks section {
+            padding: 20px;
+            flex-basis: 33.3%;
+            box-sizing: border-box;
+            border: 1px solid #eee;
+        }
+        .bookmarks section:nth-of-type(2n - 1) { background: #fafafa; }
+        .bookmarks ul { padding: 0 15px; }
+        .bookmarks ul li {
+            position: relative;
+            margin: 10px 0;
+            list-style: none;
+          text-align: left;
+        }
+        .bookmarks ul li:before {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #c9ced1;
+            border-radius: 50%;
+            left: -13px;
+            top: 12px;
+        }
+        @media (prefers-color-scheme: dark) {
+          html { background: #0e121c; }
+          body { color: #6C7486; }
+          h3 { color: #cadef8; }
+          .bookmarks section { border: 1px solid #2c2e43; background: #191e31; }
+          .bookmarks section:nth-of-type(2n - 1) { background: #151B2A; }
+          .bookmarks ul li:before { background: #6C7486; }
+          .bookmarks a:hover { color: #cadef8; }
+        }
+        /* 去除 iFrame 元素的内边距和边框 */
+        iframe {
+          display: block;
+          border: none;
+          margin: 0;
+          padding: 0;
+        }
+        a{
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="body" style="width:100%;height:100%">
+        <iframe src="body.html" style="width:100%;height:100%;margin-top:15%"></iframe>
+    </div>
+    <div class="bookmarks" id="menu" style="display:none;">  
+    </div>
+</body>
+</html>
+<script src="static/jquery/jquery.js"></script>
+<script src="static/layui-v2.8.0/layui/layui.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    setTimeout(function(){
+        $("#body").fadeOut(2000,function(){
+            $("#menu").fadeIn(2000);
+        });
+    },2000)
+});
+getJsonFile()
+function getJsonFile(path = "static/json_file/menu.json"){
+    // 创建一个新的 XMLHttpRequest 对象
+    var xhr = new XMLHttpRequest();
+
+    // 设置请求的类型、URL 以及是否异步
+    xhr.open('GET', path, true);
+
+    // 设置响应类型为 JSON
+    xhr.responseType = 'json';
+
+    // 当请求完成时执行的回调函数
+    xhr.onload = function() {
+      // 如果请求成功
+      if (xhr.status === 200) {
+        // 获取响应数据
+        var data = xhr.response;
+        // 处理获取到的 JSON 数据
+        html = "";
+        $.each(data, function(key, value) {
+          html += '<section><h3>'+value.head+'</h3><ul>';
+          $.each(value.list, function(k, v) {
+            // console.log(v);
+            html += '<li><a url="'+v.url+'" type="'+v.type+'">'+v.name+'</a></li>';
+          });
+          html += '</ul></section>';
+          $("#menu").html(html)
+        });
+        console.log(html);
+      }
+    };
+
+    // 发送异步请求
+    xhr.send();
+  }
+$("#menu").on("click","a",function(){
+    data = $(this);
+    if(data.attr("type") == "self"){
+      layer.open({
+        type: 2,
+        title: data.html(),
+        area: ['90%', '90%'],
+        content: data.attr("url") // 这里填写需要弹出的网页地址
+      });
+    }else if(data.attr("type") == "new"){
+      window.open(data.attr("url"), '_blank');
+    }
+});
+</script>
